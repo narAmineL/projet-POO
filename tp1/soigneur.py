@@ -1,6 +1,6 @@
 from personnage import Personnage
 
-class soigneur(Personnage):
+class Soigneur(Personnage):
     def __init__(self, pv, nom, pointsSoin):
         super().__init__(pv, nom)
         self.__pointsSoin = pointsSoin

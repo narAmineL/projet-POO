@@ -1,10 +1,9 @@
 from personnage import Personnage
-from guerrier import guerrier
-from soigneur import soigneur
+from guerrier import Guerrier
+from soigneur import Soigneur
 
 
 import tkinter as tk
-from tkinter import messagebox
 
 import random
 
@@ -105,13 +104,13 @@ class main():
     def random_personnage(s) -> Personnage:
         random_pv = random.randint(1, 100)
         random_nom = "Personnage" + str(random.randint(1, 100))
-        return guerrier(pv=random_pv, nom=random_nom, degats=1000)
+        return Guerrier(pv=random_pv, nom=random_nom, degats=1000)
 
 
 
     #fonction qui se lance quand on left click sur qqun dans la liste de gauche
-    def selectInLeftBox(s, event):
-        selection = s.listbox_g.curselection()
+    def selectInLeftBox(s, event) -> None:
+        selection:tuple = s.listbox_g.curselection()
 
         if not selection:
             return
@@ -121,34 +120,36 @@ class main():
         s.updateTextBoxes()
 
 
-    def selectInRightBox(s, event):
-        selection = s.listbox_d.curselection()
+    def selectInRightBox(s, event) -> None:
+        selection:tuple = s.listbox_d.curselection()
 
-        if not selection:
+        if not selection: #si tuple NULL: rien faire.
             return
         
         index = selection[0]
         s.rightSelection = s.arrayP[index]
         s.updateTextBoxes()
 
-
-    def combat(s):
-        if (s.leftSelection == None or s.rightSelection == None) or (not isinstance(s.leftSelection, guerrier)):
+    #fct lancée à la pression du bouton COMBATTRE.
+    def combat(s) -> None:
+        #sortir si selec NULL ou si lanceur!=guerrier.
+        if (s.leftSelection == None or s.rightSelection == None) or (not isinstance(s.leftSelection, Guerrier)):
             return
 
-        s.leftSelection.attack(s.rightSelection)
+        s.leftSelection.attack(s.rightSelection) #FCT ATTK
         if s.rightSelection.pv <=0:
-            s.arrayP.remove(s.rightSelection)
+            s.arrayP.remove(s.rightSelection) #supprimer les morts.
 
         s.leftSelection=None
         s.rightSelection=None
+        #|--- UPDATE DISPLAY ---|
         s.updateListBoxes()
         s.updateTextBoxes()
 
-    
-    def soigne(s):
+    #fct lancée à la pression du bouton SOIGNER.
+    def soigne(s) -> None:
 
-        if not isinstance(s.leftSelection, soigneur):
+        if not isinstance(s.leftSelection, Soigneur):
             return
 
         s.leftSelection.heal(s.rightSelection)
