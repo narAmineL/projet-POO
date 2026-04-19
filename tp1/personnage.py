@@ -7,6 +7,11 @@ class Personnage:
     def pv(self):
         return self.__pv
     
+    @pv.setter
+    def pv(self, value):
+        self.__pv = value
+
+
     @property
     def nom(self):
         return self.__nom

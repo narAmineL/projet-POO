@@ -1,6 +1,7 @@
 from personnage import Personnage
-from guerrier import Guerrier
-from soigneur import Soigneur
+from guerrier import *
+from soigneur import *
+
 
 
 import tkinter as tk
@@ -88,6 +89,18 @@ class main():
             s.text_d.insert(tk.END, f"{s.rightSelection.__str__()}")
 
 
+    #metter a jour les boutons: les rend actif/inactifs selon notre selection du lanceur(personnage left)
+    def updateButtons(s):
+
+        if isinstance(s.leftSelection, Guerrier):
+            s.btn_combat.config(state="active")
+            s.btn_soigne.config(state="disabled")
+        elif isinstance(s.leftSelection, Soigneur):
+            s.btn_combat.config(state="disabled")
+            s.btn_soigne.config(state="active")
+        else:
+            s.btn_combat.config(state="disabled")
+            s.btn_soigne.config(state="disabled")
 
     def __init__(s):
         s.arrayP = [s.random_personnage() for _ in range(10)]
@@ -102,10 +115,21 @@ class main():
 
     #fonction qui renvoie un personnage au hasard.
     def random_personnage(s) -> Personnage:
-        random_pv = random.randint(1, 100)
-        random_nom = "Personnage" + str(random.randint(1, 100))
-        return Guerrier(pv=random_pv, nom=random_nom, degats=1000)
 
+        allClasses = Guerrier.__subclasses__() + Soigneur.__subclasses__()
+        randomClass = random.choice(allClasses)
+
+        random_pv = random.randint(1, 100)
+        random_degats = random.randint(1, 20)
+        random_pointsSoin = random.randint(1, 20)
+        random_nom = randomClass.__name__ + str(random.randint(1, 100))
+
+
+        if issubclass(randomClass, Guerrier):
+            return randomClass(pv=random_pv, nom=random_nom, degats=random_degats)
+        elif issubclass(randomClass, Soigneur):
+            return randomClass(pv=random_pv, nom=random_nom, pointsSoin=random_pointsSoin)
+        
 
 
     #fonction qui se lance quand on left click sur qqun dans la liste de gauche
@@ -118,6 +142,7 @@ class main():
         index = selection[0]
         s.leftSelection = s.arrayP[index]
         s.updateTextBoxes()
+        s.updateButtons()
 
 
     def selectInRightBox(s, event) -> None:
@@ -130,15 +155,27 @@ class main():
         s.rightSelection = s.arrayP[index]
         s.updateTextBoxes()
 
-    #fct lancée à la pression du bouton COMBATTRE.
-    def combat(s) -> None:
-        #sortir si selec NULL ou si lanceur!=guerrier.
-        if (s.leftSelection == None or s.rightSelection == None) or (not isinstance(s.leftSelection, Guerrier)):
-            return
 
-        s.leftSelection.attack(s.rightSelection) #FCT ATTK
-        if s.rightSelection.pv <=0:
-            s.arrayP.remove(s.rightSelection) #supprimer les morts.
+
+
+
+
+
+    #fct pour savoir si on peut valider une input: çàd si on a bien select 2 persos non identiques
+    def isInputValid(s) -> bool:
+        if s.leftSelection == None or s.rightSelection == None: #Si qqun est not selected
+            return False
+        elif s.leftSelection==s.rightSelection: #Si je me cible moi-même
+            return False
+        else:
+            return True
+
+    #fct qui se lance à la fin d'un tour càd après une input valide
+    def endOfTurn(s) -> None:
+        #retirer les morts
+        for p in s.arrayP:
+            if p.pv <= 0:
+                s.arrayP.remove(p)
 
         s.leftSelection=None
         s.rightSelection=None
@@ -146,15 +183,25 @@ class main():
         s.updateListBoxes()
         s.updateTextBoxes()
 
+
+
+    #fct lancée à la pression du bouton COMBATTRE.
+    def combat(s) -> None:
+        #sortir si selec NULL ou si lanceur!=guerrier.
+        if not s.isInputValid() or (not isinstance(s.leftSelection, Guerrier)):
+            return
+     
+        s.leftSelection.attack(s.rightSelection) #FCT ATTK
+        s.endOfTurn()
+
+
     #fct lancée à la pression du bouton SOIGNER.
     def soigne(s) -> None:
-
-        if not isinstance(s.leftSelection, Soigneur):
+        if not s.isInputValid() or not isinstance(s.leftSelection, Soigneur):
             return
 
         s.leftSelection.heal(s.rightSelection)
-        s.selectInLeftBox(None)
-        s.selectInRightBox(None)
+        s.endOfTurn()
 
 
 
