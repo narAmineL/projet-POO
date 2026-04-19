@@ -18,7 +18,7 @@ class main():
         # -------------------------
         root=s.root
 
-        root.title("TP")
+        root.title("PROJET POO")
         # Listbox gauche
         s.listbox_g = tk.Listbox(root)
         s.listbox_g.grid(row=0, column=0, padx=10, pady=10)
@@ -35,14 +35,18 @@ class main():
         s.text_d = tk.Text(root, height=6, width=25)
         s.text_d.grid(row=1, column=2, padx=10, pady=10)
 
-        # Boutons
-        s.btn_combat = tk.Button(root, text="COMBATTRE")
-        s.btn_combat.grid(row=0, column=1, padx=10)
-        s.btn_combat.config(command=s.combat)
 
-        s.btn_soigne = tk.Button(root, text="SOIGNER")
-        s.btn_soigne.grid(row=1, column=1, padx=10)
-        s.btn_soigne.config(command=s.soigne)
+        s.textLogs = tk.Text(root, height=6, width=50)
+        s.textLogs.grid(row=1, column=1, padx=10)
+
+        frame_btn = tk.Frame(root)
+        frame_btn.grid(row=0, column=0, columnspan=3, pady=10)
+
+        s.btn_combat = tk.Button(frame_btn, text="COMBATTRE", command=s.combat)
+        s.btn_combat.pack(side="left", padx=10)
+
+        s.btn_soigne = tk.Button(frame_btn, text="SOIGNER", command=s.soigne)
+        s.btn_soigne.pack(side="left", padx=10)
 
         # Remplir les listbox
         for p in s.arrayP:
@@ -111,6 +115,7 @@ class main():
 
         s.root = tk.Tk() #Racine de notre affichage tkinter.
         s.createGUI()
+
 
 
     #fonction qui renvoie un personnage au hasard.
@@ -188,20 +193,18 @@ class main():
     #fct lancée à la pression du bouton COMBATTRE.
     def combat(s) -> None:
         #sortir si selec NULL ou si lanceur!=guerrier.
-        if not s.isInputValid() or (not isinstance(s.leftSelection, Guerrier)):
-            return
-     
-        s.leftSelection.attack(s.rightSelection) #FCT ATTK
-        s.endOfTurn()
+        if s.isInputValid() and isinstance(s.leftSelection, Guerrier):
+
+            s.leftSelection.attack(s.rightSelection) #FCT ATTK
+            s.endOfTurn()
 
 
     #fct lancée à la pression du bouton SOIGNER.
     def soigne(s) -> None:
-        if not s.isInputValid() or not isinstance(s.leftSelection, Soigneur):
-            return
+        if s.isInputValid() and isinstance(s.leftSelection, Soigneur):
 
-        s.leftSelection.heal(s.rightSelection)
-        s.endOfTurn()
+            s.leftSelection.heal(s.rightSelection)
+            s.endOfTurn()
 
 
 

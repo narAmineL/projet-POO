@@ -38,6 +38,9 @@ class Squelette(Guerrier):
         self.pv=0
         return super().attack(cible)
     
+    def __str__(self):
+        return super().__str__() + f"\n\nMeurt après une attaque."
+
 
 
 #Nain: si il frappe un autre guerrier, dégats*2. Si il frappe un autre nain, dégats*4. Histoire de fierté.
